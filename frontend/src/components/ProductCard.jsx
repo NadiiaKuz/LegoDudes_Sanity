@@ -1,77 +1,77 @@
 export default  function ProductCard({p, setCart}){
+    /*
+      handleClick kjøres når brukeren klikker på
+      f.eks. "Legg i handlekurv"-knappen.
+    */
+    const handleClick = () => {
+
       /*
-        handleClick kjøres når brukeren klikker på
-        f.eks. "Legg i handlekurv"-knappen.
+        setCart brukes for å oppdatere handlekurven (state).
+        Vi sender inn en funksjon for å være sikre på
+        at vi alltid jobber med nyeste versjon av cart (prev).
       */
-      const handleClick = () => {
+      setCart((prev) =>
 
         /*
-          setCart brukes for å oppdatere handlekurven (state).
-          Vi sender inn en funksjon for å være sikre på
-          at vi alltid jobber med nyeste versjon av cart (prev).
+          prev.some(...) sjekker om produktet allerede
+          finnes i handlekurven.
+          - Returnerer true hvis et produkt har samme prodid
+          - Returnerer false hvis produktet ikke finnes
         */
-        setCart((prev) =>
+        prev.some(item => item.prodid === p.prodid)
 
           /*
-            prev.some(...) sjekker om produktet allerede
-            finnes i handlekurven.
-            - Returnerer true hvis et produkt har samme prodid
-            - Returnerer false hvis produktet ikke finnes
+            HVIS produktet allerede finnes:
+            → vi må øke antallet (quantity) med 1
           */
-          prev.some(item => item.prodid === p.prodid)
+          ? prev.map(item =>
 
-            /*
-              HVIS produktet allerede finnes:
-              → vi må øke antallet (quantity) med 1
-            */
-            ? prev.map(item =>
+              /*
+                Vi går gjennom alle produkter i handlekurven
+                og finner produktet med riktig prodid
+              */
+              item.prodid === p.prodid
 
                 /*
-                  Vi går gjennom alle produkter i handlekurven
-                  og finner produktet med riktig prodid
+                  Når riktig produkt er funnet:
+                  - kopier alle eksisterende egenskaper
+                  - øk quantity med 1
                 */
-                item.prodid === p.prodid
+                ? { ...item, quantity: item.quantity + 1 }
 
-                  /*
-                    Når riktig produkt er funnet:
-                    - kopier alle eksisterende egenskaper
-                    - øk quantity med 1
-                  */
-                  ? { ...item, quantity: item.quantity + 1 }
+                /*
+                  Hvis det er et annet produkt:
+                  - returner det uendret
+                */
+                : item
+            )
 
-                  /*
-                    Hvis det er et annet produkt:
-                    - returner det uendret
-                  */
-                  : item
-              )
+          /*
+            HVIS produktet IKKE finnes i handlekurven:
+            → legg det til som et nytt produkt
+          */
+          : [
+              ...prev,            // behold alle eksisterende produkter
+              {
+                ...p,             // kopier produktdata
+                quantity: 1       // start antall på 1
+              }
+            ]
+      );
 
-            /*
-              HVIS produktet IKKE finnes i handlekurven:
-              → legg det til som et nytt produkt
-            */
-            : [
-                ...prev,            // behold alle eksisterende produkter
-                {
-                  ...p,             // kopier produktdata
-                  quantity: 1       // start antall på 1
-                }
-              ]
-        );
-
-        /*
-          Logger en melding i konsollen for debugging,
-          slik at utvikleren ser at klikket ble registrert.
-        */
-        console.log("Legg i handlekurv");
-      };
-    return (
-      <article className="product-card">
-          <img src={`website_images/PROD_${p.imagefile}`} alt={p.title} />
-          <a href="#">${p.category}</a>
-          <h3>{p.title}</h3>
-          <p>Kr. {p.price},-</p>
-          <button onClick={handleClick}>Legg til handlevogn</button>
-      </article>
-    )
-  }
+      /*
+        Logger en melding i konsollen for debugging,
+        slik at utvikleren ser at klikket ble registrert.
+      */
+      console.log("Legg i handlekurv");
+    };
+  return (
+    <article className="product-card">
+        <img src={p.imageURL} alt={p.productname} />
+        <a href="#">{p.category}</a>
+        <h3>{p.productname}</h3>
+        <p>Kr. {p.price},-</p>
+        <button onClick={handleClick}>Legg til handlevogn</button>
+    </article>
+  )
+}
